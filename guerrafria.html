@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordena la Guerra Fría</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/tone"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #121212;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1548199973-03c6c6447774?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            background-position: center;
+            animation: fadeInBackground 2s ease forwards;
+        }
+        @keyframes fadeInBackground {
+            from { opacity: 0; }
+            to { opacity: 0.7; }
+        }
+        .container {
+            width: 95%;
+            max-width: 800px;
+            padding: 15px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1s ease forwards;
+            opacity: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: #ffdb58;
+            text-shadow: 0 0 8px rgba(255, 219, 88, 0.8);
+        }
+        @media (max-width: 400px){
+           h1{
+             font-size: 1.5rem
+           }
+        }
+        #event-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        #event-list li {
+            padding: 10px;
+            background-color: #3b82f6;
+            margin-bottom: 8px;
+            border-radius: 0.75rem;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            border: 2px solid #6d28d9;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition:  transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        #event-list li:hover {
+            background-color: #4c1d95;
+            transform: scale(1.03);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+        }
+        #event-list li:active {
+            cursor: grabbing;
+            transform: scale(1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        #event-list li span {
+            margin-right: 10px;
+            font-size: 1rem;
+            color: #f5f5f5;
+            padding: 6px;
+            border-radius: 50%;
+            background-color: #8b5cf6;
+            min-width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:  1px 1px 2px rgba(0, 0, 0, 0.3);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        #feedback {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            min-height: 30px;
+            font-weight: 600;
+        }
+        #feedback.correct {
+            color: #00ff00;
+            animation: pulse 1s ease infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        #feedback.incorrect {
+            color: #ff0000;
+            animation: shake 0.5s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        #points {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            border: 3px solid #ffdb58;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ffdb58;
+            display: none;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            animation: fadeIn 1s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        #check-button {
+            padding: 12px 24px;
+            background-color: #ffdb58;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            font-family: 'Press Start 2P', cursive;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        #check-button:hover {
+            background-color: #f5c518;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+        #check-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        #start-button {
+            padding: 12px 24px;
+            background-color: #ffdb58;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            font-family: 'Press Start 2P', cursive;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        #start-button:hover {
+            background-color: #f5c518;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+        #start-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        #logo-container {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+        #logo {
+            max-width: 150px;
+            border-radius: 10px;
+        }
+        #reset-button {
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            font-family: 'Press Start 2P', cursive;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: 0;
+            font-weight: 600;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+        #reset-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+        #reset-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="logo-container">
+            <img id="logo" src="https://blogsaverroes.juntadeandalucia.es/ieslucussolis/files/2023/09/Lucus-logo_clipdrop-background-removal-1024x1024.png" alt="Logo del IES Lucus Solis">
+        </div>
+        <h1>Ordena la Guerra Fría</h1>
+        <button id="start-button">Comenzar Actividad</button>
+        <ul id="event-list">
+        </ul>
+        <div id="feedback"></div>
+        <div id="points">Puntos: 0</div>
+        <div class="button-container">
+            <button id="check-button">Comprobar Orden</button>
+            <button id="reset-button">Reiniciar</button>
+        </div>
+        <audio id="background-music" src="https://www.cjoint.com/doc/25_03/OCDtGRsA6t4_Quiz.mp3" preload="auto" loop></audio>
+    </div>
+    <script>
+        let points = 0;
+        const pointsDisplay = document.getElementById('points');
+        const feedback = document.getElementById('feedback');
+        const eventList = document.getElementById('event-list');
+        const checkButton = document.getElementById('check-button');
+        const startButton = document.getElementById('start-button');
+        const resetButton = document.getElementById('reset-button');
+        const backgroundMusic = document.getElementById('background-music');
+        // Lista de eventos de la Guerra Fría
+        const coldWarEvents = [
+            { text: "Fin de la Segunda Guerra Mundial", year: 1945 },
+            { text: "Doctrina Truman", year: 1947 },
+            { text: "Bloqueo de Berlín", year: 1948 },
+            { text: "Creación de la OTAN", year: 1949 },
+            { text: "Guerra de Corea", year: 1950 },
+            { text: "Crisis de los Misiles de Cuba", year: 1962 },
+            { text: "Guerra de Vietnam", year: 1964 },
+            { text: "Llegada del Hombre a la Luna", year: 1969 },
+            { text: "Caída del Muro de Berlín", year: 1989 },
+            { text: "Disolución de la Unión Soviética", year: 1991 },
+        ];
+        let shuffledEvents;
+        let correctOrder;
+        let errors = [];
+        // Inicializar Tone.js (efectos de sonido)
+        const correctSound = new Tone.Synth({
+            oscillator: { type: 'triangle' },
+            envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.2 }
+        }).toDestination();
+        const incorrectSound = new Tone.Synth({
+            oscillator: { type: 'sawtooth' },
+            envelope: { attack: 0.001, decay: 0.1, sustain: 0.3, release: 0.5 }
+        }).toDestination();
+        const winSound = new Tone.PluckSynth().toDestination();
+        const moveSound = new Tone.Synth({ // Sonido para mover las filas
+            oscillator: { type: 'sine' },       // Onda sinusoidal
+            envelope: { attack: 0.001, decay: 0.1, sustain: 0.3, release: 0.5 }
+        }).toDestination();
+        // Función para reproducir el sonido correcto
+        function playCorrectSound() {
+            correctSound.triggerAttackRelease("C4", "16n");
+        }
+        // Función para reproducir el sonido incorrecto
+        function playIncorrectSound() {
+            incorrectSound.triggerAttackRelease("G2", "8n");
+        }
+        // Función para reproducir el sonido de victoria
+        function playWinSound() {
+            const now = Tone.now();
+            winSound.triggerAttackRelease("C4", "8n", now);
+            winSound.triggerAttackRelease("E4", "8n", now + 0.1);
+            winSound.triggerAttackRelease("G4", "8n", now + 0.2);
+            winSound.triggerAttackRelease("C5", "1n", now + 0.3);
+        }
+        // Función para reproducir el sonido al mover las filas
+        function playMoveSound() {
+            moveSound.triggerAttackRelease("C3", "16n"); // Tono y duración cortos
+        }
+        // Función para mezclar los eventos
+        function shuffleEvents() {
+            shuffledEvents = [...coldWarEvents].sort(() => Math.random() - 0.5);
+            eventList.innerHTML = '';
+            shuffledEvents.forEach((event, index) => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('event-item');
+                listItem.innerHTML = `<span class="event-number">${index + 1}</span>${event.text}`;
+                listItem.setAttribute('data-year', event.year);
+                eventList.appendChild(listItem);
+            });
+            startButton.style.display = 'none';
+            resetButton.style.display = 'none';
+            points = coldWarEvents.length * 10;
+            pointsDisplay.textContent = `Puntos: ${points}`;
+            pointsDisplay.style.display = 'block';
+             // Inicializar Sortable.js aquí, después de que la lista esté poblada
+            new Sortable(eventList, {
+                animation: 150,
+                onEnd(evt) {
+                    const newIndex = evt.newIndex;
+                    const oldIndex = evt.oldIndex;
+                    // Reordenar visualmente los números
+                    const items = Array.from(eventList.children);
+                    items.forEach((item, index) => {
+                        const numberSpan = item.querySelector('.event-number');
+                        numberSpan.textContent = index + 1;
+                    });
+                    playMoveSound(); // Reproducir sonido al mover
+                },
+            });
+            correctOrder = coldWarEvents.map(event => event.year);
+            errors = [];
+            feedback.textContent = '';
+            backgroundMusic.volume = 0.3;
+            backgroundMusic.play();
+        }
+        // Función para verificar el orden de los eventos
+        function checkOrder() {
+            const listItems = Array.from(eventList.children);
+            const userOrder = listItems.map(item => parseInt(item.getAttribute('data-year')));
+            errors = [];
+            let isCorrect = true;
+            for (let i = 0; i < correctOrder.length; i++) {
+                if (userOrder[i] !== correctOrder[i]) {
+                    isCorrect = false;
+                    points -= 10;
+                    errors.push({
+                        expected: correctOrder[i],
+                        actual: userOrder[i],
+                        index: i
+                    });
+                }
+            }
+            if (isCorrect) {
+                playWinSound();
+                feedback.textContent = "¡Perfecto! ¡Ganaste!";
+                backgroundMusic.pause();
+            } else {
+                playIncorrectSound();
+                feedback.textContent = "¡Incorrecto! Revisa el orden.";
+            }
+            pointsDisplay.textContent = `Puntos: ${points}`;
+            listItems.forEach((item, index) => {
+                const itemYear = parseInt(item.getAttribute('data-year'));
+                if (userOrder.indexOf(itemYear) === correctOrder.indexOf(itemYear)) {
+                    item.style.backgroundColor = '#6ee7b7';
+                } else {
+                    item.style.backgroundColor = '#f87171';
+                }
+            });
+            feedback.className = isCorrect ? 'correct' : 'incorrect';
+            resetButton.style.display = 'block';
+        }
+        // Función para reiniciar la actividad
+        function resetActivity() {
+            shuffleEvents();
+            points = coldWarEvents.length * 10;
+            pointsDisplay.textContent = `Puntos: ${points}`;
+            eventList.style.display = 'block';
+            pointsDisplay.style.display = 'block';
+            feedback.textContent = '';
+            feedback.className = '';
+            resetButton.style.display = 'none';
+            backgroundMusic.play();
+        }
+        // Event listener para el botón de comprobar
+        checkButton.addEventListener('click', checkOrder);
+        // Event listener para el botón de comenzar
+        startButton.addEventListener('click', function () {
+            shuffleEvents();
+            eventList.style.display = 'block';
+            pointsDisplay.style.display = 'block';
+            backgroundMusic.play();
+        });
+        // Event listener para el botón de reiniciar
+        resetButton.addEventListener('click', resetActivity);
+    </script>
+</body>
+</html>
